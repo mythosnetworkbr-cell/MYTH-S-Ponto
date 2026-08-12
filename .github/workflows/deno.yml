@@ -1,4 +1,4 @@
-name: MYTHØS Ponto CI
+name: MYTHØS Ponto CI + Android APK
 
 on:
   push:
@@ -23,3 +23,21 @@ jobs:
         run: npm run typecheck
       - name: Expo Doctor
         run: npm run doctor
+
+  android-apk:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/complete-app'
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Build Android APK with EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest build --platform android --profile preview --non-interactive --no-wait
