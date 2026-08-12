@@ -1,42 +1,57 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow will install Deno then run `deno lint` and `deno test`.
-# For more information see: https://github.com/denoland/setup-deno
-
-name: Deno
+name: MYTHØS Ponto CI + Android APK
 
 on:
   push:
-    branches: ["main"]
+    branches: [main, feature/complete-app]
   pull_request:
-    branches: ["main"]
-
-permissions:
-  contents: read
+    branches: [main]
 
 jobs:
-  test:
+  quality:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Setup repo
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Deno
-        # uses: denoland/setup-deno@v1
-        uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31  # v1.1.2
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          deno-version: v1.x
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Expo Doctor
+        run: npm run doctor
 
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
-      # - name: Verify formatting
-      #   run: deno fmt --check
-
-      - name: Run linter
-        run: deno lint
-
-      - name: Run tests
-        run: deno test -A
+  android-apk:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/complete-app'
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install
+      - name: Install EAS CLI
+        run: npm install --global eas-cli
+      - name: Build Android APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform android --profile preview --non-interactive --wait --json > eas-build.json
+      - name: Download APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          APK_URL=$(node -e "const fs=require('fs'); const x=JSON.parse(fs.readFileSync('eas-build.json','utf8')); const b=Array.isArray(x)?x[0]:x; console.log(b.artifacts?.buildUrl || '')")
+          test -n "$APK_URL"
+          curl -L "$APK_URL" -o MYTHOS-Ponto-${{ github.run_number }}.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MYTHOS-Ponto-APK-${{ github.run_number }}
+          path: MYTHOS-Ponto-${{ github.run_number }}.apk
+          if-no-files-found: error
