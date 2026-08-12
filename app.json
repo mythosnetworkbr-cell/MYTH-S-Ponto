@@ -2,13 +2,13 @@
   "expo": {
     "name": "MYTHØS Ponto",
     "slug": "mythos-ponto",
-    "version": "0.2.0",
+    "version": "0.4.0",
     "orientation": "portrait",
     "scheme": "mythosponto",
     "userInterfaceStyle": "dark",
     "android": {
       "package": "br.com.mythos.ponto",
-      "versionCode": 2,
+      "versionCode": 4,
       "permissions": []
     },
     "plugins": ["expo-router"],
