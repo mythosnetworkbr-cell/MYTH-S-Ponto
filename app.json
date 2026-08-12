@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "MYTHØS Ponto",
+    "slug": "mythos-ponto",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "mythosponto",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "br.com.mythos.ponto",
+      "versionCode": 1,
+      "permissions": []
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
