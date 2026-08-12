@@ -1,9 +1,15 @@
 {
   "name": "mythos-ponto",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "main": "expo-router/entry",
-  "scripts": {"start":"expo start","android":"expo start --android","web":"expo start --web"},
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "doctor": "expo-doctor"
+  },
   "dependencies": {
     "@expo/vector-icons":"^15.0.0",
     "@react-native-async-storage/async-storage":"^2.2.0",
@@ -15,5 +21,8 @@
     "react-native":"0.81.4",
     "react-native-safe-area-context":"~5.6.0",
     "react-native-screens":"~4.16.0"
+  },
+  "devDependencies": {
+    "typescript":"~5.9.2"
   }
 }
