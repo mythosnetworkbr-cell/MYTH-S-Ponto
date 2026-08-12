@@ -1,6 +1,6 @@
 {
   "name": "mythos-ponto",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -23,6 +23,7 @@
     "react-native-screens":"~4.16.0"
   },
   "devDependencies": {
+    "@types/react":"~19.1.10",
     "typescript":"~5.9.2"
   }
 }
