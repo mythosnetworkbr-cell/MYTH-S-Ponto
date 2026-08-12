@@ -5,13 +5,28 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 const roles = ['Owner', 'Staff', 'ALL', 'Manager', 'Líder', 'Admin²', 'Auxiliar', 'Funcionário'] as const;
 type Role = typeof roles[number];
 
+const minimumHours: Record<Role, number> = {
+  Owner: 3,
+  Staff: 3,
+  ALL: 3,
+  Manager: 3,
+  Líder: 3,
+  'Admin²': 2,
+  Auxiliar: 2,
+  Funcionário: 2,
+};
+
 export default function Home() {
   const [role, setRole] = useState<Role>('Funcionário');
   const [lastAction, setLastAction] = useState('Nenhum registro hoje');
+  const requiredHours = minimumHours[role];
 
   useEffect(() => {
     AsyncStorage.getItem('mythos.role').then(value => {
       if (roles.includes(value as Role)) setRole(value as Role);
+    });
+    AsyncStorage.getItem('mythos.lastPunch').then(value => {
+      if (value) setLastAction(value);
     });
   }, []);
 
@@ -34,6 +49,11 @@ export default function Home() {
           <Text style={styles.label}>PERFIL</Text>
           <Text style={styles.role}>{role}</Text>
           <Text style={styles.muted}>{management ? 'Acesso de gestão habilitado' : 'Registro pessoal de ponto'}</Text>
+          <View style={styles.requirement}>
+            <Text style={styles.requirementTitle}>META DIÁRIA OBRIGATÓRIA</Text>
+            <Text style={styles.requirementHours}>{requiredHours}h</Text>
+            <Text style={styles.muted}>Tempo mínimo de ponto por dia para este cargo</Text>
+          </View>
         </View>
 
         <View style={styles.card}>
@@ -66,6 +86,9 @@ const styles = StyleSheet.create({
   label: { color: '#8f95a8', fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
   role: { color: '#fff', fontSize: 24, fontWeight: '700' },
   muted: { color: '#8f95a8', fontSize: 13 },
+  requirement: { marginTop: 4, backgroundColor: '#191523', borderRadius: 15, padding: 15, borderWidth: 1, borderColor: '#32254f' },
+  requirementTitle: { color: '#a78bfa', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  requirementHours: { color: '#fff', fontSize: 30, fontWeight: '800', marginVertical: 2 },
   primary: { backgroundColor: '#8b5cf6', borderRadius: 14, padding: 17, alignItems: 'center' },
   secondary: { flex: 1, backgroundColor: '#20232d', borderRadius: 14, padding: 16, alignItems: 'center' },
   exit: { backgroundColor: '#3a2027', borderRadius: 14, padding: 17, alignItems: 'center' },
