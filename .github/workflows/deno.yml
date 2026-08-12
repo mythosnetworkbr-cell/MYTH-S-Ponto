@@ -1,16 +1,8 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow will install Deno then run `deno lint` and `deno test`.
-# For more information see: https://github.com/denoland/setup-deno
-
-name: Deno
+name: Mobile CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature/**"]
   pull_request:
     branches: ["main"]
 
@@ -18,25 +10,19 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Setup repo
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Deno
-        # uses: denoland/setup-deno@v1
-        uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31  # v1.1.2
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          deno-version: v1.x
-
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
-      # - name: Verify formatting
-      #   run: deno fmt --check
-
-      - name: Run linter
-        run: deno lint
-
-      - name: Run tests
-        run: deno test -A
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Expo doctor
+        run: npx expo-doctor
+      - name: Typecheck
+        run: npm run typecheck
