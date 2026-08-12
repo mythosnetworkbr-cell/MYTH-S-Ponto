@@ -15,8 +15,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 24
       - name: Install dependencies
         run: npm install
       - name: Typecheck
@@ -34,10 +33,25 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - name: Install dependencies
         run: npm install
-      - name: Build Android APK with EAS
+      - name: Install EAS CLI
+        run: npm install --global eas-cli
+      - name: Build Android APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas-cli@latest build --platform android --profile preview --non-interactive --no-wait
+        run: eas build --platform android --profile preview --non-interactive --wait --json > eas-build.json
+      - name: Download APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          APK_URL=$(node -e "const fs=require('fs'); const x=JSON.parse(fs.readFileSync('eas-build.json','utf8')); const b=Array.isArray(x)?x[0]:x; console.log(b.artifacts?.buildUrl || '')")
+          test -n "$APK_URL"
+          curl -L "$APK_URL" -o MYTHOS-Ponto-${{ github.run_number }}.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MYTHOS-Ponto-APK-${{ github.run_number }}
+          path: MYTHOS-Ponto-${{ github.run_number }}.apk
+          if-no-files-found: error
